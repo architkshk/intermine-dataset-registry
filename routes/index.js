@@ -8,7 +8,7 @@ var router = express.Router();
  * Method:    GET
  * Description: Render home page.
  */
-router.get('/', function(req, res, next) {
+router.get(['/', '/:mine'], function (req, res, next) {
     if (typeof (req.query.success)){
       var operation = req.query.success;
       if (operation == 1){

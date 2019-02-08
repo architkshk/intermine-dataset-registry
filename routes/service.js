@@ -24,6 +24,9 @@ router.get('/datasets', function (req, res, next) {
             ]
         }
     }
+    if (req.query.mine) {
+        db_query.minename = req.query.mine;
+    }
 
     dataset.find(db_query).sort({name:1}).exec(function(err, datasets){
         if (err){

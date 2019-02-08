@@ -5,35 +5,44 @@
  *
  */
 $(document).ready(function () {
-
+  let mine = window.location.pathname.split("/")[1] || '';
   // Search dataset functionality
   $("#search-dataset").on('keyup', function(){
     $("#list-table-body").empty();
-    getDatsets($(this).val());
+    getDatsets($(this).val(), mine);
   });
 
   // When loaded, all datasets are loaded
-  getDatsets("");
-
+  getDatsets("", mine);
 });
 
 /**
  * Get datasets from the database and fill the list view.
  * @search Search query text to search among datasets
  */
-function getDatsets(search){
-
-    if (search === ''){
+function getDatsets(search, mine = ''){
+    if (search === '' && mine === ''){
         $.get("service/last-update", function (response) {
             $("#mines-count").animateNumber({ number : response.lastUpdate[0].minesQueried });
         })
     }
 
-  $.get("service/datasets/?q=" + search, function(response){
+  $.get("service/datasets/?q=" + search +"&mine="+mine, function(response){
     $("#list-table-body").empty();
     var globalDatasets = response.datasets;
-
     $("#datasets-count").animateNumber({number : globalDatasets.length});
+
+    var numberOfMines = globalDatasets.map(dataset => dataset.minename).filter((minename, index, arr) => arr.indexOf(minename) == index).length;
+    $("#mines-count").animateNumber({ number: numberOfMines });
+
+    if (globalDatasets.length === 0) {
+      $("#no-dataset-msg").css("display", "block");
+      $("#dataset-table").css("display", "none");
+    } else {
+      $("#no-dataset-msg").css("display", "none");
+      $("#dataset-table").css("display", "table");
+    }
+
     for (var i = 0; i < globalDatasets.length; i++){
       var instance = globalDatasets[i];
 
